@@ -6,6 +6,7 @@ namespace Assets.Scripts
     public class WorldGen : MonoBehaviour
     {
         private Transform wallParent;
+        public GameObject WallPrefab;
         public float SizeInMeters;
         public List<Sprite> SpritesToPlace; 
 
@@ -19,6 +20,13 @@ namespace Assets.Scripts
         // Use this for initialization
         private void Start()
         {
+            if (!WallPrefab)
+            {
+                Debug.LogError(string.Format("{0}: No prefab for wall set.", name));
+                enabled = false;
+                return;
+            }
+
             var wallContainer = new GameObject("Walls");
             wallContainer.transform.SetParent(transform);
             wallParent = wallContainer.transform;
