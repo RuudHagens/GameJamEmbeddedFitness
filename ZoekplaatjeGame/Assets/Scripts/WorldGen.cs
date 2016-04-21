@@ -19,12 +19,17 @@ namespace Assets.Scripts
         // Use this for initialization
         private void Start()
         {
-            wallParent = new GameObject("Walls").transform;
+            var wallContainer = new GameObject("Walls");
+            wallContainer.transform.SetParent(transform);
+            wallParent = wallContainer.transform;
+
             // Spawn walls on edge of playfield.
             AddWall("Top", transform.up);
             AddWall("Right", transform.right);
             AddWall("Down", -transform.up);
             AddWall("Left", -transform.right);
+
+            Generate();
         }
 
         // Update is called once per frame
@@ -35,8 +40,6 @@ namespace Assets.Scripts
 
         private void AddWall(string wallName, Vector3 direction)
         {
-
-
             // Create wall.
             GameObject wall = new GameObject(wallName);
             if (direction == transform.right || direction == -transform.right)
@@ -44,7 +47,7 @@ namespace Assets.Scripts
 
             // Add collision box.
             var coll = wall.AddComponent<BoxCollider2D>();
-            coll.size = new Vector3(10, .1f);
+            coll.size = new Vector3(SizeInMeters, .1f);
             wall.transform.position = transform.position + direction * (SizeInMeters / 2f);
 
             wall.transform.SetParent(wallParent);
