@@ -5,16 +5,30 @@ namespace Assets.Scripts
 {
     public class WorldGen : MonoBehaviour
     {
-        private Transform wallParent;
+        [Header("Prefabs")]
         public GameObject WallPrefab;
-        public float SizeInMeters;
-        public List<Sprite> SpritesToPlace; 
 
+        public GameObject SpritePrefab;
+
+
+        private Transform wallParent;
+        private Transform spriteParent;
+
+        [Header("Misc")]
+        public float SizeInMeters;
+
+        public int AmountOfSprites;
+        public List<Sprite> SpritesToPlace;
 
         private void OnDrawGizmos()
         {
             Gizmos.color = Color.red;
             Gizmos.DrawWireCube(transform.position, new Vector3(SizeInMeters, SizeInMeters, .1f));
+        }
+
+        private void Reset()
+        {
+            AmountOfSprites = 5;
         }
 
         // Use this for initialization
@@ -31,6 +45,9 @@ namespace Assets.Scripts
             wallContainer.transform.SetParent(transform);
             wallParent = wallContainer.transform;
 
+            spriteParent = new GameObject("Sprites").transform;
+            spriteParent.SetParent(transform);
+
             // Spawn walls on edge of playfield.
             AddWall("Top", transform.up);
             AddWall("Right", transform.right);
@@ -43,13 +60,12 @@ namespace Assets.Scripts
         // Update is called once per frame
         private void Update()
         {
-            
         }
 
         private void AddWall(string wallName, Vector3 direction)
         {
             // Create wall.
-            GameObject wall = Instantiate(WallPrefab);
+            var wall = Instantiate(WallPrefab);
             wall.name = wallName;
             if (direction == transform.right || direction == -transform.right)
                 wall.transform.rotation = Quaternion.AngleAxis(90, Vector3.forward);
@@ -63,7 +79,21 @@ namespace Assets.Scripts
 
         private void Generate()
         {
-            
+            for (var i = 0; i < AmountOfSprites; i++)
+            {
+                var newSprite =
+                    (GameObject)
+                        Instantiate(SpritePrefab,
+                            new Vector2(Random.Range(-SizeInMeters / 2f, SizeInMeters / 2f),
+                                Random.Range(-SizeInMeters / 2f, SizeInMeters / 2f)), Quaternion.identity);
+
+                var spriteRenderer = newSprite.GetComponent<SpriteRenderer>();
+                // First one should always spawn selected image that player needs.
+                spriteRenderer.sprite = i == 0 ? HUDManager.Instance.SelectedSprite : SpritesToPlace[Random.Range(0, SpritesToPlace.Count - 1)];
+                spriteRenderer.name = spriteRenderer.sprite.name;
+
+                newSprite.transform.SetParent(spriteParent);
+            }
         }
     }
 }

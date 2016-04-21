@@ -23,6 +23,7 @@ namespace Assets.Scripts
         // Update is called once per frame
         private void Update()
         {
+            if (!Target) return;
             transform.position = new Vector3(Target.position.x, Target.position.y, transform.position.z);
         }
     }

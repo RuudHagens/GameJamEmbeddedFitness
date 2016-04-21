@@ -1,7 +1,6 @@
-﻿using Assets.Scripts;
-using UnityEngine;
+﻿using UnityEngine;
 
-namespace Assets
+namespace Assets.Scripts
 {
     [RequireComponent(typeof(BoxCollider2D), typeof(SpriteRenderer))]
     public class ColoredCollider : MonoBehaviour
