@@ -49,13 +49,13 @@ namespace Assets.Scripts
         private void AddWall(string wallName, Vector3 direction)
         {
             // Create wall.
-            GameObject wall = new GameObject(wallName);
+            GameObject wall = Instantiate(WallPrefab);
+            wall.name = wallName;
             if (direction == transform.right || direction == -transform.right)
                 wall.transform.rotation = Quaternion.AngleAxis(90, Vector3.forward);
 
             // Add collision box.
-            var coll = wall.AddComponent<BoxCollider2D>();
-            coll.size = new Vector3(SizeInMeters, .1f);
+            wall.GetComponent<BoxCollider2D>().size = new Vector3(10, .1f, .1f);
             wall.transform.position = transform.position + direction * (SizeInMeters / 2f);
 
             wall.transform.SetParent(wallParent);
