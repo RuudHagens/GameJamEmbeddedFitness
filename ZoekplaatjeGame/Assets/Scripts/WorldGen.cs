@@ -18,7 +18,11 @@ namespace Assets.Scripts
         public float SizeInMeters;
 
         public int AmountOfSprites;
-        public List<Sprite> SpritesToPlace;
+
+        /// <summary>
+        /// Sprites that will be placed on the field.
+        /// </summary>
+        public List<Sprite> AvailableSprites;
 
         private void OnDrawGizmos()
         {
@@ -84,12 +88,13 @@ namespace Assets.Scripts
                 var newSprite =
                     (GameObject)
                         Instantiate(SpritePrefab,
-                            new Vector2(Random.Range(-SizeInMeters / 2f, SizeInMeters / 2f),
-                                Random.Range(-SizeInMeters / 2f, SizeInMeters / 2f)), Quaternion.identity);
+                            new Vector2(Random.Range(-SizeInMeters / 2f + 1, SizeInMeters / 2f - 1),
+                                Random.Range(-SizeInMeters / 2f + 1, SizeInMeters / 2f - 1)), Quaternion.identity);
 
                 var spriteRenderer = newSprite.GetComponent<SpriteRenderer>();
+
                 // First one should always spawn selected image that player needs.
-                spriteRenderer.sprite = i == 0 ? HUDManager.Instance.SelectedSprite : SpritesToPlace[Random.Range(0, SpritesToPlace.Count - 1)];
+                spriteRenderer.sprite = i == 0 ? GameManager.Instance.Player.Render.sprite : AvailableSprites[Random.Range(0, AvailableSprites.Count - 1)];
                 spriteRenderer.name = spriteRenderer.sprite.name;
 
                 newSprite.transform.SetParent(spriteParent);
