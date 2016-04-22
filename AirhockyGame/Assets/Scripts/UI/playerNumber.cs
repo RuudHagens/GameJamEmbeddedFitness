@@ -19,10 +19,7 @@ public class playerNumber : MonoBehaviour {
 	void Update () {
         
         t.text = player.GetNumber().ToString();
-//        transform.position.Set(player.transform.position.x, player.transform.position.y, transform.position.z);
         rect.position = new Vector3(player.transform.position.x, player.transform.position.y+5, transform.position.z);
-        Debug.Log("Playerpos "+player.transform.position.x+","+ player.transform.position.y);
-        Debug.Log("Pos is now " + rect.position.x + "," + rect.position.y);
     }
 
     public void SetPlayer(GameObject p)
