@@ -4,7 +4,9 @@ using System.Collections;
 public enum PlayerNumber
 {
     one,
-    two
+    two,
+    three,
+    four
 }
 public class Player : MonoBehaviour
 {
@@ -35,6 +37,12 @@ public class Player : MonoBehaviour
                 w = KeyCode.LeftArrow;
                 s = KeyCode.DownArrow;
                 e = KeyCode.RightArrow;
+                break;
+            case PlayerNumber.three:
+                n = KeyCode.I;
+                w = KeyCode.J;
+                s = KeyCode.K;
+                e = KeyCode.L;
                 break;
             default:
                 break;
