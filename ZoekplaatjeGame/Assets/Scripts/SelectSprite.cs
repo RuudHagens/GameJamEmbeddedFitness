@@ -54,6 +54,7 @@ namespace Assets.Scripts
             {
                 // Fade out and display.
                 player.Hud.Done = true;
+                player.gameObject.SetActive(false);
             }
         }
 
