@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 namespace Assets.Scripts
@@ -17,10 +18,20 @@ namespace Assets.Scripts
         [Header("Misc")]
         public float SizeInMeters;
 
-        public int AmountOfSprites;
+        /// <summary>
+        ///     Amount of sprites that are on the field for each player.
+        /// </summary>
+        public int AmountOfSpritesPerPlayer;
 
         /// <summary>
-        /// Sprites that will be placed on the field.
+        ///     Amount of sprites that are spawned that no player can pick-up. 0 is no extra sprites, 1 is 100% extra sprites.
+        /// </summary>
+        [Tooltip("Amount of sprites that are spawned that no player can pick-up.")]
+        [Range(0, 5)]
+        public float AmountOfExtraSprites;
+
+        /// <summary>
+        ///     Sprites that will be placed on the field.
         /// </summary>
         public List<Sprite> AvailableSprites;
 
@@ -32,7 +43,8 @@ namespace Assets.Scripts
 
         private void Reset()
         {
-            AmountOfSprites = 5;
+            AmountOfSpritesPerPlayer = 5;
+            AmountOfExtraSprites = 1f;
         }
 
         // Use this for initialization
@@ -58,7 +70,8 @@ namespace Assets.Scripts
             AddWall("Down", -transform.up);
             AddWall("Left", -transform.right);
 
-            Generate();
+            GenerateWorld();
+            AssignPlayerSprites();
         }
 
         // Update is called once per frame
@@ -81,23 +94,51 @@ namespace Assets.Scripts
             wall.transform.SetParent(wallParent);
         }
 
-        private void Generate()
+        private void GenerateWorld()
         {
-            for (var i = 0; i < AmountOfSprites; i++)
+            // Spawn sprites for players to pick up.
+            for (var i = 0; i < GameManager.Instance.Players.Count(); i++)
             {
-                var newSprite =
-                    (GameObject)
-                        Instantiate(SpritePrefab,
-                            new Vector2(Random.Range(-SizeInMeters / 2f + 1, SizeInMeters / 2f - 1),
-                                Random.Range(-SizeInMeters / 2f + 1, SizeInMeters / 2f - 1)), Quaternion.identity);
+                for (var j = 0; j < AmountOfSpritesPerPlayer; j++)
+                {
+                    AddRandomPositionSprite(AvailableSprites[i]);
+                }
+            }
 
-                var spriteRenderer = newSprite.GetComponent<SpriteRenderer>();
+            // Spawn extra 'fake' sprites.
+            for (var i = 0;
+                i < AmountOfSpritesPerPlayer * GameManager.Instance.Players.Count() * AmountOfExtraSprites;
+                i++)
+            {
+                AddRandomPositionSprite(
+                    AvailableSprites[Random.Range(GameManager.Instance.Players.Count(), AvailableSprites.Count)]);
+            }
+        }
 
-                // First one should always spawn selected image that player needs.
-                spriteRenderer.sprite = i == 0 ? GameManager.Instance.Player.Render.sprite : AvailableSprites[Random.Range(0, AvailableSprites.Count - 1)];
-                spriteRenderer.name = spriteRenderer.sprite.name;
+        private void AddRandomPositionSprite(Sprite sprite)
+        {
+            var obj =
+                (GameObject)
+                    Instantiate(SpritePrefab,
+                        new Vector2(Random.Range(-SizeInMeters / 2f + 1, SizeInMeters / 2f - 1),
+                            Random.Range(-SizeInMeters / 2f + 1, SizeInMeters / 2f - 1)), Quaternion.identity);
 
-                newSprite.transform.SetParent(spriteParent);
+            var spriteScript = obj.GetComponent<SpriteRenderer>();
+            spriteScript.sprite = sprite;
+
+            obj.transform.SetParent(spriteParent);
+        }
+
+        /// <summary>
+        ///     Assigns sprites to the players on the field in order.
+        /// </summary>
+        private void AssignPlayerSprites()
+        {
+            var i = 0;
+            foreach (var player in GameManager.Instance.Players)
+            {
+                player.Render.sprite = AvailableSprites[i];
+                i++;
             }
         }
     }

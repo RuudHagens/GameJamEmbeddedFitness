@@ -1,23 +1,29 @@
-﻿using UnityEngine;
+﻿using System.Linq;
+using UnityEngine;
 
 namespace Assets.Scripts
 {
-    public class FollowCamera : MonoBehaviour
+    [RequireComponent(typeof(Camera))]
+    public class PlayAreaCamera : MonoBehaviour
     {
+        /// <summary>
+        ///     Target to follow around.
+        /// </summary>
         public Transform Target;
+
+        /// <summary>
+        ///     Camera script that this script is a sibling of.
+        /// </summary>
+        public Camera Cam { get; private set; }
 
         private void Awake()
         {
-            if (!Target)
-            {
-                Debug.LogWarning("No target set for FollowCamera to follow.");
-                enabled = false;
-            }
         }
 
         // Use this for initialization
         private void Start()
         {
+            Cam = GetComponent<Camera>();
         }
 
         // Update is called once per frame

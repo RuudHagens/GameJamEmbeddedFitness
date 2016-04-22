@@ -4,15 +4,19 @@ using UnityEngine;
 
 namespace Assets.Scripts
 {
+    [RequireComponent(typeof(Player), typeof(SpriteRenderer))]
     public class SelectSprite : MonoBehaviour
     {
         public event EventHandler<SpriteSelectedEventArgs> SpriteSelected;
+
         private SpriteRenderer render;
+        private Player player;
 
         // Use this for initialization
         private void Start()
         {
             render = GetComponent<SpriteRenderer>();
+            player = GetComponent<Player>();
         }
 
         // Update is called once per frame
@@ -33,12 +37,23 @@ namespace Assets.Scripts
             var otherSprite = other.GetComponent<SpriteRenderer>();
             if (otherSprite.sprite == render.sprite)
             {
+                player.Hud.PlayerScore++;
+                CheckFinished();
                 OnSpriteSelected(new SpriteSelectedEventArgs(otherSprite.sprite));
                 Destroy(other.gameObject);
             }
             else
             {
                 otherSprite.color = Color.red;
+            }
+        }
+
+        private void CheckFinished()
+        {
+            if (player.Hud.PlayerScore >= GameManager.Instance.WorldGen.AmountOfSpritesPerPlayer)
+            {
+                // Fade out and display.
+                player.Hud.Done = true;
             }
         }
 
