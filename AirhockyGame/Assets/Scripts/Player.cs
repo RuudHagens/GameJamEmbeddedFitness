@@ -8,16 +8,20 @@ public enum PlayerNumber
 }
 public class Player : MonoBehaviour
 {
-    private int speed = 20;
     public PlayerNumber number;
+    private int speed = 20;
 
     private KeyCode n;
     private KeyCode w;
     private KeyCode e;
     private KeyCode s;
 
+    private Color orignalColor;
+
     void Start()
     {
+        orignalColor = this.GetComponent<Renderer>().material.color;
+
         switch (number)
         {
             case PlayerNumber.one:
@@ -55,5 +59,23 @@ public class Player : MonoBehaviour
         {
             transform.position += new Vector3(speed, 0, 0) * Time.deltaTime;
         }
+    }
+
+    void OnCollisionEnter(Collision col)
+    {
+        if (col.gameObject.tag == "Player")
+        {
+            Debug.Log("I feel triggered");
+            this.GetComponent<Renderer>().material.color = mixColors(orignalColor, col.gameObject.GetComponent<Player>().orignalColor);
+        }
+    }
+
+    public Color mixColors(Color p1Color, Color p2Color)
+    {
+        Color result = new Color(0, 0, 0, 0);
+        result += p1Color;
+        result += p2Color;
+        result /= 2;
+        return result;
     }
 }
