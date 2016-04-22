@@ -18,6 +18,8 @@ public class Player : MonoBehaviour
     private KeyCode e;
     private KeyCode s;
 
+    private int Number;
+
     private Color orignalColor;
 
     void Start()
@@ -43,6 +45,12 @@ public class Player : MonoBehaviour
                 w = KeyCode.J;
                 s = KeyCode.K;
                 e = KeyCode.L;
+                break;
+            case PlayerNumber.four:
+                n = KeyCode.Keypad8;
+                w = KeyCode.Keypad4;
+                s = KeyCode.Keypad2;
+                e = KeyCode.Keypad6;
                 break;
             default:
                 break;
@@ -116,5 +124,15 @@ public class Player : MonoBehaviour
         result += p2Color;
         result /= 2;
         return result;
+    }
+
+    public int GetNumber()
+    {
+        return Number;
+    }
+
+    public void SetNumber(int n)
+    {
+        Number = n;
     }
 }
