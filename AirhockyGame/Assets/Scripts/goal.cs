@@ -18,7 +18,6 @@ public class goal : MonoBehaviour {
 
     void OnCollisionEnter(Collision col)
     {
-        Debug.Log("Ball hit goal " + team);
         Team s;
         if (team == Team.red) { s = Team.blue; } else { s = Team.red; }
         if (col.gameObject.tag == "Ball")
