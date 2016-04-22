@@ -26,7 +26,8 @@ namespace Assets.Scripts
 
         private void Reset()
         {
-            MoveSpeed = 1;
+            body.drag = 7;
+            MoveSpeed = 20;
         }
 
         // Update is called once per frame
