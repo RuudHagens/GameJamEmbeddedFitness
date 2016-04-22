@@ -48,7 +48,6 @@ namespace Assets.Scripts
             var alpha = fadeIn ? 0 : 1f;
             while ((fadeIn && alpha < 1) || (!fadeIn && alpha > 0))
             {
-                print("Alpha: " + alpha);
                 alpha += (fadeIn ? 2f : -2f) * Time.deltaTime;
                 doneGroup.alpha = alpha;
                 yield return null;
