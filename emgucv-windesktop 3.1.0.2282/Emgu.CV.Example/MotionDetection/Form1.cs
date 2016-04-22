@@ -18,87 +18,65 @@ using Emgu.Util;
 
 namespace MotionDetection
 {
-   public partial class Form1 : Form
-   {
-      private Capture _capture;
-      private MotionHistory _motionHistory;
-      private BackgroundSubtractor _forgroundDetector;
+    public partial class Form1 : Form
+    {
+        private Capture _capture;
+        private MotionHistory _motionHistory;
 
-      public Form1()
-      {
-         InitializeComponent();
+        public Form1()
+        {
+            InitializeComponent();
 
-         //try to create the capture
-         if (_capture == null)
-         {
-            try
+            //try to create the capture
+            if (_capture == null)
             {
-               _capture = new Capture();
+                try
+                {
+                    _capture = new Capture();
+                }
+                catch (NullReferenceException excpt)
+                {   //show errors if there is any
+                    MessageBox.Show(excpt.Message);
+                }
             }
-            catch (NullReferenceException excpt)
-            {   //show errors if there is any
-               MessageBox.Show(excpt.Message);
+
+            if (_capture != null) //if camera capture has been successfully created
+            {
+                _motionHistory = new MotionHistory(
+                    1.0, //in second, the duration of motion history you wants to keep
+                    0.05, //in second, maxDelta for cvCalcMotionGradient
+                    0.5); //in second, minDelta for cvCalcMotionGradient
+
+                _capture.ImageGrabbed += ProcessFrame;
+                _capture.Start();
             }
-         }
 
-         if (_capture != null) //if camera capture has been successfully created
-         {
-            _motionHistory = new MotionHistory(
-                1.0, //in second, the duration of motion history you wants to keep
-                0.05, //in second, maxDelta for cvCalcMotionGradient
-                0.5); //in second, minDelta for cvCalcMotionGradient
-
-            _capture.ImageGrabbed += ProcessFrame;
-            _capture.Start();
-         }
-      }
-
-      private Mat _segMask = new Mat();
-      private Mat _forgroundMask = new Mat();
-      private void ProcessFrame(object sender, EventArgs e)
-      {
-         Mat image = new Mat();
-
-         _capture.Retrieve(image);
-         if (_forgroundDetector == null)
-         {
-            _forgroundDetector = new BackgroundSubtractorMOG2();
-         }
-            capturedImage.Image = image;
-         _forgroundDetector.Apply(image, _forgroundMask);
-
-         //update the motion history
-         _motionHistory.Update(_forgroundMask);
             
-                  
+        }
 
-         #region get a copy of the motion mask and enhance its color
-         double[] minValues, maxValues;
-         Point[] minLoc, maxLoc;
-         _motionHistory.Mask.MinMax(out minValues, out maxValues, out minLoc, out maxLoc);
-         Mat motionMask = new Mat();
-         using (ScalarArray sa = new ScalarArray(255.0 / maxValues[0]))
-            CvInvoke.Multiply(_motionHistory.Mask, sa, motionMask, 1, DepthType.Cv8U);
-         //Image<Gray, Byte> motionMask = _motionHistory.Mask.Mul(255.0 / maxValues[0]);
-         #endregion
+        private void ProcessFrame(object sender, EventArgs e)
+        {
+            Mat image = new Mat();
 
-         //create the motion image 
-         Mat motionImage = new Mat(motionMask.Size.Height, motionMask.Size.Width, DepthType.Cv8U, 3);
-         //display the motion pixels in blue (first channel)
-         //motionImage[0] = motionMask;
-         CvInvoke.InsertChannel(motionMask, motionImage, 0);
+            _capture.Retrieve(image);
 
-         //Threshold to define a motion area, reduce the value to detect smaller motion
-         double minArea = 1000;
+            if (highlightBody.Checked)
+            {
+                image = detectBody(image);
+            }
+            else
+            {
+                image = detectFace(image);
+            }
 
-         //storage.Clear(); //clear the storage
-         Rectangle[] rects;
-         using (VectorOfRect boundingRect = new VectorOfRect())
-         {
-            _motionHistory.GetMotionComponents(_segMask, boundingRect);
-            rects = boundingRect.ToArray();
-         }
+            if (this.Disposing || this.IsDisposed)
+                return;
 
+            afterProcesImage.Image = image;
+        }
+
+        private Mat detectBody(Mat image)
+        {
             long procesingtime;
             Rectangle[] results = FindPedestrian.Find(image, true, out procesingtime);
             foreach (Rectangle rect in results)
@@ -106,33 +84,42 @@ namespace MotionDetection
                 CvInvoke.Rectangle(image, rect, new Bgr(Color.Red).MCvScalar);
             }
 
-         if (this.Disposing || this.IsDisposed)
-            return;
+            return image;
+        }
 
+        private Mat detectFace(Mat image)
+        {
+            long detectionTime;
+            List<Rectangle> faces = new List<Rectangle>();
+            bool tryUseCuda = true;
 
-            afterProcesImage.Image = image;
+            DetectFace.Detect(image, "haarcascade_frontalface_default.xml", faces, tryUseCuda, out detectionTime);
 
+            foreach (Rectangle face in faces)
+            {
+                CvInvoke.Rectangle(image, face, new Bgr(Color.Red).MCvScalar, 2);
+            }
+            return image;
+        }
 
-      }
+        /// <summary>
+        /// Clean up any resources being used.
+        /// </summary>
+        /// <param name="disposing">true if managed resources should be disposed; otherwise, false.</param>
+        protected override void Dispose(bool disposing)
+        {
 
-      /// <summary>
-      /// Clean up any resources being used.
-      /// </summary>
-      /// <param name="disposing">true if managed resources should be disposed; otherwise, false.</param>
-      protected override void Dispose(bool disposing)
-      {
+            if (disposing && (components != null))
+            {
+                components.Dispose();
+            }
 
-         if (disposing && (components != null))
-         {
-            components.Dispose();
-         }
+            base.Dispose(disposing);
+        }
 
-         base.Dispose(disposing);
-      }
-
-      private void Form1_FormClosed(object sender, FormClosedEventArgs e)
-      {
-         _capture.Stop();
-      }
+        private void Form1_FormClosed(object sender, FormClosedEventArgs e)
+        {
+            _capture.Stop();
+        }
     }
 }
