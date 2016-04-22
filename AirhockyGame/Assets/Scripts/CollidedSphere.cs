@@ -2,7 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 
-public class mergedSphere : MonoBehaviour
+public class CollidedSphere : MonoBehaviour
 {
 
     public GameObject sphere;
@@ -17,7 +17,7 @@ public class mergedSphere : MonoBehaviour
     }
 
     // Update is called once per frame
-    void Update()
+    void FixedUpdate()
     {
         if (collidedPlayers.Count != 0 && s != null)
         {
@@ -35,7 +35,7 @@ public class mergedSphere : MonoBehaviour
     /// Draws a sphere around the average position of the players
     /// </summary>
     /// <param name="players"></param>
-    public void spawnSphere(List<GameObject> players)
+    public GameObject spawnSphere(List<GameObject> players)
     {
         collidedPlayers = players;
         Vector3 playerAverageLocation = new Vector3(0, 0, 0);
@@ -47,5 +47,6 @@ public class mergedSphere : MonoBehaviour
 
         s = (GameObject)Instantiate(sphere, playerAverageLocation, Quaternion.identity);
         s.transform.localScale *= players.Count;
+        return s;
     }
 }
