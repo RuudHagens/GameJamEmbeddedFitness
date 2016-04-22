@@ -65,8 +65,16 @@ public class Player : MonoBehaviour
     {
         if (col.gameObject.tag == "Player")
         {
-            Debug.Log("I feel triggered");
             this.GetComponent<Renderer>().material.color = mixColors(orignalColor, col.gameObject.GetComponent<Player>().orignalColor);
+        }
+    }
+
+    void OnCollisionExit(Collision col)
+    {
+        if (col.gameObject.tag == "Player")
+        {
+            this.GetComponent<Renderer>().material.color = orignalColor;
+            col.gameObject.GetComponent<Renderer>().material.color = col.gameObject.GetComponent<Player>().orignalColor;
         }
     }
 
