@@ -4,7 +4,9 @@ using System.Collections;
 public enum PlayerNumber
 {
     one,
-    two
+    two,
+    three,
+    four
 }
 public class Player : MonoBehaviour
 {
@@ -15,6 +17,8 @@ public class Player : MonoBehaviour
     private KeyCode w;
     private KeyCode e;
     private KeyCode s;
+
+    private int Number;
 
     private Color orignalColor;
 
@@ -35,6 +39,18 @@ public class Player : MonoBehaviour
                 w = KeyCode.LeftArrow;
                 s = KeyCode.DownArrow;
                 e = KeyCode.RightArrow;
+                break;
+            case PlayerNumber.three:
+                n = KeyCode.I;
+                w = KeyCode.J;
+                s = KeyCode.K;
+                e = KeyCode.L;
+                break;
+            case PlayerNumber.four:
+                n = KeyCode.Keypad8;
+                w = KeyCode.Keypad4;
+                s = KeyCode.Keypad2;
+                e = KeyCode.Keypad6;
                 break;
             default:
                 break;
@@ -65,8 +81,39 @@ public class Player : MonoBehaviour
     {
         if (col.gameObject.tag == "Player")
         {
-            Debug.Log("I feel triggered");
             this.GetComponent<Renderer>().material.color = mixColors(orignalColor, col.gameObject.GetComponent<Player>().orignalColor);
+        }
+        if (col.gameObject.tag == "Ball")
+        {
+            Vector3 bounceDirection = new Vector3(0, 0, 0);
+            if (Input.GetKey(n))
+            {
+                bounceDirection += new Vector3(0, 1, 0);
+            }
+            if (Input.GetKey(s))
+            {
+                bounceDirection += new Vector3(0, -1, 0);
+            }
+            if (Input.GetKey(w))
+            {
+                bounceDirection += new Vector3(-1, 0, 0);
+            }
+            if (Input.GetKey(e))
+            {
+                bounceDirection += new Vector3(1, 0, 0);
+            }
+            bounceDirection.Normalize();
+            bounceDirection *= 20;
+            col.gameObject.GetComponent<Rigidbody>().AddForce(bounceDirection, ForceMode.Impulse);
+        }
+    }
+
+    void OnCollisionExit(Collision col)
+    {
+        if (col.gameObject.tag == "Player")
+        {
+            this.GetComponent<Renderer>().material.color = orignalColor;
+            col.gameObject.GetComponent<Renderer>().material.color = col.gameObject.GetComponent<Player>().orignalColor;
         }
     }
 
@@ -77,5 +124,15 @@ public class Player : MonoBehaviour
         result += p2Color;
         result /= 2;
         return result;
+    }
+
+    public int GetNumber()
+    {
+        return Number;
+    }
+
+    public void SetNumber(int n)
+    {
+        Number = n;
     }
 }

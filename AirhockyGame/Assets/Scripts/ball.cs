@@ -23,9 +23,14 @@ public class ball : MonoBehaviour {
 
     void OnCollisionEnter(Collision col)
     {
-        if (col.gameObject.tag == "Goal")
-        {
-            Start();
-        }
+        //if (col.gameObject.tag == "Goal")
+        //{
+        //    Start();
+        //}
+    }
+
+    public void Reset()
+    {
+        this.Start();
     }
 }
