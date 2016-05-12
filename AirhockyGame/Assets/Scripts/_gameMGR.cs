@@ -52,14 +52,11 @@ public class _gameMGR : MonoBehaviour {
         {
             case Team.red:
                 return scoreR;
-                break;
             case Team.blue:
                 return scoreB;
-                break;
             default:
-                return 0;
                 Debug.LogError("Score queried for invalid team " + t);
-                break;
+                return 0;
         }
     }
 

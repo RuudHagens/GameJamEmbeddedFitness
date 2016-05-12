@@ -6,12 +6,14 @@ public enum PlayerNumber
     one,
     two,
     three,
-    four
+    four,
+    nothing
 }
 public class Player : MonoBehaviour
 {
     public PlayerNumber number;
-    private int speed = 20;
+    public int speed;
+    public Team team;
 
     private KeyCode n;
     private KeyCode w;
